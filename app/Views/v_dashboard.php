@@ -92,14 +92,75 @@
         let drawControl;
         let currentDrawing = null;
 
-        const map = L.map('map', {
-            center: [0.582402, 100.858131],
-            zoom: 6
+        var peta1 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         });
 
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+        var peta2 = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.{ext}', {
+            minZoom: 0,
+            maxZoom: 20,
+            attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a>, ' +
+                '&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>, ' +
+                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            ext: 'png'
+        });
+
+        var peta3 = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
+            minZoom: 0,
+            maxZoom: 20,
+            attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a>, ' +
+                '&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>, ' +
+                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            ext: 'png'
+        });
+
+        var peta4 = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.{ext}', {
+            minZoom: 0,
+            maxZoom: 20,
+            attribution: '&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | ' +
+                '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a>, ' +
+                '&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a>, ' +
+                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            ext: 'jpg'
+        });
+
+        var lindung = L.tileLayer.wms("http://localhost:8080/geoserver/wms", {
+        layers: "lindungsumatra:kawasan_dilindungi",
+        transparent: true,
+        style: "kawasandilindungi",
+        format: "image/png"
+    });
+
+    var sumatra = L.tileLayer.wms("http://localhost:8080/geoserver/wms", {
+        layers: "lindungsumatra:sumatra",
+        style: "pulausumatra",
+        transparent: true,
+        format: "image/png"
+    });
+
+    const overlayLayers = {     
+        "Pulau Sumatra": sumatra,
+        "Kawasan Dilindungi": lindung,
+    };
+
+        // Map Initialization
+        const map = L.map('map', {
+            center: [0.582402, 100.858131], // Initial coordinates
+            zoom: 6, // Initial zoom level
+            layers: [peta3] // Default base layer
+        });
+
+        const baseLayers = {
+            "OpenStreetMap": peta1,
+            "Stadia Smooth": peta2,
+            "Stadia Smooth Dark": peta3,
+            "Stadia Satellite": peta4
+        };
+
+        // Layer Control
+        L.control.layers(baseLayers, overlayLayers, {}, { collapsed: false }).addTo(map);
+
 
         map.addLayer(drawnItems);
 
